@@ -3,9 +3,10 @@ import time
 import datetime
 
 import torch
+from datasets import load_dataset, Image
 
 from config import settings
-
+from source.ml.train import train_classifier
 
 def main():
     print(torch.__version__)
@@ -18,6 +19,8 @@ def main():
     print(f'Out Folder: {settings.OUT_FOLDER}')
 
     device = torch.device('cuda')
+
+    train_classifier()
 
 
     dummy = -32
