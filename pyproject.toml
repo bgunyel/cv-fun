@@ -19,6 +19,9 @@ tqdm = "^4.66.5"
 pyarrow = "^17.0.0"
 datasets = "^3.0.0"
 timm = "^1.0.9"
+polars = "^1.7.1"
+scikit-learn = "^1.5.2"
+pillow = "^10.4.0"
 
 
 [build-system]

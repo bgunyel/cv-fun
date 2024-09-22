@@ -11,10 +11,10 @@ class ImageClassifier(nn.Module):
         self.model = timm.create_model(
             model_name=model_name,
             pretrained=True,
-            features_only=True,
+            num_classes=0,
         )
 
     def forward(self, x):
-        h = self.model(x)
+        h = self.model.forward_features(x)
         return h
 

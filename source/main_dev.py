@@ -20,7 +20,7 @@ def main():
 
     device = torch.device('cuda')
 
-    train_classifier()
+    train_classifier(device=device)
 
 
     dummy = -32

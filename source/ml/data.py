@@ -1,23 +1,70 @@
-import torch
-from torch.utils.data import Dataset
-
-from datasets import load_dataset
+from io import BytesIO
 
 import numpy as np
+import polars as pl
+import torch
+from PIL import Image
+from sklearn.model_selection import train_test_split
+from torch.utils.data import Dataset
+
+from source.ml.utils import get_dataset_config
 
 
 class ImageDataset(Dataset):
-    def __init__(self, dataset_name: str, dataset_split: str):
+    def __init__(self, image_list: list[dict], output_width: int=None, output_height: int=None):
         super().__init__()
-        self.dataset = load_dataset(path=dataset_name, split=dataset_split)
+        self.image_list = image_list
+        self.output_width = output_width
+        self.output_height = output_height
 
     def __len__(self):
-        return len(self.dataset)
+        return len(self.image_list)
 
     def __getitem__(self, idx):
-        img = torch.tensor(np.asarray(self.dataset[idx]['image']))
-        label = self.dataset[idx]['label']
-        return img, label
+        label = self.image_list[idx]['label']
+        img_bytes = BytesIO(self.image_list[idx]['image']['bytes'])
+        img = Image.open(img_bytes).convert("RGB")
+
+        if (self.output_width is not None) and (self.output_height is not None):
+            img = img.resize((self.output_width, self.output_height))
+
+        width = img.width
+        height = img.height
+        n_channels = 3  # we convert to RGB image mode
+
+        img_tensor = torch.tensor(np.asarray(img), dtype=torch.float).view(n_channels, height, width)
+
+        return {'image': img_tensor, 'label': label}
 
 
 
+def generate_train_validation_datasets(
+        dataset_name: str,
+        validation_set_ratio: float = 0.2
+) -> tuple[ImageDataset, ImageDataset]:
+
+    dataset_config = get_dataset_config(dataset_name=dataset_name)
+    df = pl.read_parquet(dataset_config.TRAIN_FILE)
+    rows = df.rows(named=True)
+
+    idx_train, idx_valid = train_test_split(
+        range(len(rows)),
+        test_size=validation_set_ratio,
+        shuffle=True,
+        random_state=1881,
+        stratify=df.get_column('label').to_list()
+    )
+    rows_train = [rows[i] for i in idx_train]
+    rows_valid = [rows[i] for i in idx_valid]
+
+    width = dataset_config.WIDTH if hasattr(dataset_config, 'WIDTH') else None
+    height = dataset_config.HEIGHT if hasattr(dataset_config, 'HEIGHT') else None
+
+    ds_train = ImageDataset(image_list=rows_train,
+                            output_width=width,
+                            output_height=height)
+    ds_valid = ImageDataset(image_list=rows_valid,
+                            output_width=width,
+                            output_height=height)
+
+    return ds_train, ds_valid

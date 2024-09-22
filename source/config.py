@@ -11,6 +11,14 @@ class TinyImageNet(BaseModel):
     VALID_FILE: str  # Validation File
 
 
+class StanfordCars(BaseModel):
+    TRAIN_FILE: str
+    TEST_FILE: str  # Validation File
+
+    WIDTH: int = 360
+    HEIGHT: int = 240
+
+
 class Settings(BaseSettings):
 
     APPLICATION_NAME: str = "Computer Vision Fun"
@@ -19,6 +27,7 @@ class Settings(BaseSettings):
     OUT_FOLDER: str
 
     TINY_IMAGENET: TinyImageNet
+    STANFORD_CARS: StanfordCars
 
     class Config:
         case_sensitive = True
