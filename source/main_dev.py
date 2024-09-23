@@ -18,9 +18,7 @@ def main():
     print(f'Data Folder: {settings.DATA_FOLDER}')
     print(f'Out Folder: {settings.OUT_FOLDER}')
 
-    device = torch.device('cuda')
-
-    train_classifier(device=device)
+    train_classifier()
 
 
     dummy = -32

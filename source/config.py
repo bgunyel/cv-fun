@@ -14,9 +14,9 @@ class TinyImageNet(BaseModel):
 class StanfordCars(BaseModel):
     TRAIN_FILE: str
     TEST_FILE: str  # Validation File
-
     WIDTH: int = 360
     HEIGHT: int = 240
+    NUM_CLASSES: int = 196
 
 
 class Settings(BaseSettings):
@@ -37,13 +37,22 @@ class Settings(BaseSettings):
         extra='allow'
 
 
-class Constants(BaseSettings):
-    DATE_TIME_UTC: str = 'datetime_utc'
-    ID: str = 'id'
+class InceptionV3(BaseModel):
+    MODEL_NAME: str = 'timm/inception_v3.tf_adv_in1k'
+    INPUT_DIMS: tuple = (3, 299, 299)
+    FEATURE_MAP_DIMS: tuple = (2048, 8, 8)
+    HIDDEN_LAYER_SIZE: int = 256
+    DROP_OUT_PROB: float = 0.5
 
 
 class ModelSettings(BaseSettings):
-    device: str = "cuda"
+    DEVICE: str = "cuda"
+    INCEPTION_V3: InceptionV3 = InceptionV3()
+
+
+class Constants(BaseSettings):
+    DATE_TIME_UTC: str = 'datetime_utc'
+    ID: str = 'id'
 
 
 settings = Settings()

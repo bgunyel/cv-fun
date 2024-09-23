@@ -40,6 +40,8 @@ class ImageDataset(Dataset):
 
 def generate_train_validation_datasets(
         dataset_name: str,
+        image_width: int,
+        image_height: int,
         validation_set_ratio: float = 0.2
 ) -> tuple[ImageDataset, ImageDataset]:
 
@@ -57,14 +59,11 @@ def generate_train_validation_datasets(
     rows_train = [rows[i] for i in idx_train]
     rows_valid = [rows[i] for i in idx_valid]
 
-    width = dataset_config.WIDTH if hasattr(dataset_config, 'WIDTH') else None
-    height = dataset_config.HEIGHT if hasattr(dataset_config, 'HEIGHT') else None
-
     ds_train = ImageDataset(image_list=rows_train,
-                            output_width=width,
-                            output_height=height)
+                            output_width=image_width,
+                            output_height=image_height)
     ds_valid = ImageDataset(image_list=rows_valid,
-                            output_width=width,
-                            output_height=height)
+                            output_width=image_width,
+                            output_height=image_height)
 
     return ds_train, ds_valid
